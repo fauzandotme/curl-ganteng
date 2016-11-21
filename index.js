@@ -12,7 +12,7 @@ function curl(link, options) {
   let useragent = (options.useragent) ? `-A ${options.useragent}` : `-A 'User-Agent:Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 Safari/537.36' `;
   let headers = (options.headers) ? obj_to_headers(options.headers) : '';
   let head_only = (options.head_only) ? '-I ' : '';
-  let include = (options.include) ? '-i ' : '';
+  let include = '-i '; // (options.include) ? '-i ' : '';
   let cookie = (options.cookie) ? `-H 'Cookie: ${options.cookie}' ` : '';
   let location = (options.redirect) ? '-L ' : '';
   let command = `curl ${useragent+head_only+include+headers+cookie+location+url}`;
@@ -26,6 +26,7 @@ function curl(link, options) {
 }
 
 function parse_res(res, cookie_obj, req_url) {
+  console.log(res);
   let location = res.match(/Location:\ +.+/g);
   if(location) req_url = location[location.length - 1].replace('Location: ', '');
   res = res.split('\r\n\r\n');
