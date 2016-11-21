@@ -52,7 +52,7 @@ function obj_to_post(post) {
   let output = '';
   for (var key in post) {
     if (post.hasOwnProperty(key)) {
-      output += `${key}=${post[key]}&`;
+      output += `${encodeURI(key)}=${encodeURI(post[key])}&`;
     }
   }
   return output;
