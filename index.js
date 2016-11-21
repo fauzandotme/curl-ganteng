@@ -26,7 +26,7 @@ function curl(link, options) {
 }
 
 function parse_res(res, cookie_obj, req_url) {
-  console.log(res);
+  // console.log(res);
   let location = res.match(/Location:\ +.+/g);
   if(location) req_url = location[location.length - 1].replace('Location: ', '');
   res = res.split('\r\n\r\n');
@@ -45,14 +45,6 @@ function parse_res(res, cookie_obj, req_url) {
   let cookie = obj_to_cookie(cookie_obj);
   return {headers, headers_obj, cookie, cookie_obj, body, req_url};
 }
-
-curl({url: 'http://google.com', include: true, head_only: true, redirect: true, cookie: 'NID=test;  ganteng=test;    '})
-  .then((res) => {
-    console.log(res);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
 
 function obj_to_headers(headers) {
   let output = '';
