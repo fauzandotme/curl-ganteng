@@ -4,8 +4,10 @@ const fs = require('fs');
 
 module.exports = {curl, array_clean, str_clean, save_log, append};
 
-function curl(options) {
-  url = options.url;
+function curl(link, options) {
+  if(typeof link == 'string') options.url = link;
+  else options = link;
+  let url = options.url;
   let useragent = (options.useragent) ? `-A ${options.useragent}` : `-A 'User-Agent:Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 Safari/537.36' `;
   let headers = (options.headers) ? obj_to_headers(options.headers) : '';
   let head_only = (options.head_only) ? '-I ' : '';
@@ -142,4 +144,3 @@ function array_clean(arr) {
 function str_clean(str) {
   return str.replace(/\s\s+/g, '');
 }
-
