@@ -5,6 +5,7 @@ const fs = require('fs');
 module.exports = {curl, array_clean, str_clean, save_log, append};
 
 function curl(link, options) {
+  if(!options) options = {};
   if(typeof link == 'string') options.url = link;
   else options = link;
   let url = options.url;
