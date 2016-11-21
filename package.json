@@ -1,0 +1,16 @@
+{
+  "name": "curl-ganteng",
+  "version": "0.0.1",
+  "description": "Curl module for node js. Using curl command.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "curl",
+    "node",
+    "curl"
+  ],
+  "author": "fauzandotme <muhammadfauzan@live.com>",
+  "license": "ISC"
+}
