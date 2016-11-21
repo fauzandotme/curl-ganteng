@@ -12,5 +12,8 @@
     "curl"
   ],
   "author": "fauzandotme <muhammadfauzan@live.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.22.0"
+  }
 }

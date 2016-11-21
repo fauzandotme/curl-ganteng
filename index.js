@@ -1,8 +1,9 @@
 const exec = require('child_process').exec;
 const querystring = require('querystring');
 const fs = require('fs');
+const cheerio = require('cheerio');
 
-module.exports = {curl, array_clean, str_clean, save_log, append};
+module.exports = {curl, array_clean, str_clean, save_log, append, serialize_post};
 
 function curl(link, options) {
   if(!options) options = {};
@@ -137,4 +138,14 @@ function array_clean(arr) {
 
 function str_clean(str) {
   return str.replace(/\s\s+/g, '');
+}
+
+function serialize_post(res) {
+  let $ = cheerio.load(res.body);
+  let posts = $('form').serializeArray();
+  let post = {};
+  posts.forEach((item) => {
+    post[item.name] = item.value;
+  });
+  return post;
 }
