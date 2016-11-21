@@ -9,14 +9,16 @@ function curl(link, options) {
   if(!options) options = {};
   if(typeof link == 'string') options.url = link;
   else options = link;
+  if(!options.redirect) options.redirect = true;
   let url = options.url;
   let useragent = (options.useragent) ? `-A ${options.useragent}` : `-A 'User-Agent:Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 Safari/537.36' `;
   let headers = (options.headers) ? obj_to_headers(options.headers) : '';
   let head_only = (options.head_only) ? '-I ' : '';
+  let post = (options.post) ? `'-d ${obj_to_post(options.post)}' ` : '';
   let include = '-i '; // (options.include) ? '-i ' : '';
   let cookie = (options.cookie) ? `-H 'Cookie: ${options.cookie}' ` : '';
   let location = (options.redirect) ? '-L ' : '';
-  let command = `curl ${useragent+head_only+include+headers+cookie+location+url}`;
+  let command = `curl ${useragent+head_only+include+headers+cookie+location+post+url}`;
   return new Promise((resolve, reject) => {
     exec(command,{maxBuffer: 1024 * 5000}, (err, res) => {
       if(err) reject(err);
@@ -27,7 +29,6 @@ function curl(link, options) {
 }
 
 function parse_res(res, cookie_obj, req_url) {
-  // console.log(res);
   let location = res.match(/Location:\ +.+/g);
   if(location) req_url = location[location.length - 1].replace('Location: ', '');
   res = res.split('\r\n\r\n');
@@ -47,6 +48,15 @@ function parse_res(res, cookie_obj, req_url) {
   return {headers, headers_obj, cookie, cookie_obj, body, req_url};
 }
 
+function obj_to_post(post) {
+  let output = '';
+  for (var key in post) {
+    if (post.hasOwnProperty(key)) {
+      output += `${key}=${post[key]}&`;
+    }
+  }
+  return output;
+}
 function obj_to_headers(headers) {
   let output = '';
   for (var key in headers) {
