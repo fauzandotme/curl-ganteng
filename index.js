@@ -20,8 +20,6 @@ function curl(link, options) {
   let cookie = (options.cookie) ? `-H 'Cookie: ${options.cookie}' ` : '';
   let location = (options.redirect) ? '-L ' : '';
   let command = `curl ${useragent+head_only+include+headers+cookie+location+post+referer}'${url}'`;
-  // console.log(command);
-  save_log(command, 'command.txt')
   return new Promise((resolve, reject) => {
     exec(command,{maxBuffer: 1024 * 5000}, (err, res) => {
       if(err) reject(err);
