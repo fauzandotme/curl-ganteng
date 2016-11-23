@@ -11,14 +11,17 @@ function curl(link, options) {
   else options = link;
   if(!options.redirect) options.redirect = true;
   let url = options.url;
-  let useragent = (options.useragent) ? `-A ${options.useragent}` : `-A 'User-Agent:Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 Safari/537.36' `;
+  let referer = (options.referer) ? `-e '${options.referer};auto' ` : `-e ';auto' `;
+  let useragent = (options.useragent) ? `-A '${options.useragent}' ` : `-A 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 Safari/537.36' `;
   let headers = (options.headers) ? obj_to_headers(options.headers) : '';
   let head_only = (options.head_only) ? '-I ' : '';
-  let post = (options.post) ? `'-d ${obj_to_post(options.post)}' ` : '';
+  let post = (options.post) ? `-d '${obj_to_post(options.post)}' ` : '';
   let include = '-i '; // (options.include) ? '-i ' : '';
   let cookie = (options.cookie) ? `-H 'Cookie: ${options.cookie}' ` : '';
   let location = (options.redirect) ? '-L ' : '';
-  let command = `curl ${useragent+head_only+include+headers+cookie+location+post+url}`;
+  let command = `curl ${useragent+head_only+include+headers+cookie+location+post+referer}'${url}'`;
+  // console.log(command);
+  save_log(command, 'command.txt')
   return new Promise((resolve, reject) => {
     exec(command,{maxBuffer: 1024 * 5000}, (err, res) => {
       if(err) reject(err);
@@ -39,7 +42,6 @@ function parse_res(res, cookie_obj, req_url) {
   });
   body = str_clean(array_clean(body).join('\n'));
 
-
   let headers_obj = headers_to_object(headers);
   if(cookie_obj) {
     cookie_obj = append(cookie_to_object(cookie_obj), cookie_to_object(get_cookie(headers_obj)))
@@ -52,7 +54,7 @@ function obj_to_post(post) {
   let output = '';
   for (var key in post) {
     if (post.hasOwnProperty(key)) {
-      output += `${encodeURI(key)}=${encodeURI(post[key])}&`;
+      output += `${urlEncode(key)}=${urlEncode(post[key])}&`;
     }
   }
   return output;
@@ -61,7 +63,8 @@ function obj_to_headers(headers) {
   let output = '';
   for (var key in headers) {
     if (headers.hasOwnProperty(key)) {
-      output += `-H '${key.uppercase_first_letter()}: ${headers[key]} '`;
+      output += `-H '${key.toLowerCase()}: ${headers[key]}' `;
+      // output += `-H '${key.uppercase_first_letter()}: ${headers[key]}' `;
     }
   }
   return output;
@@ -158,4 +161,10 @@ function serialize_post(res) {
     post[item.name] = item.value;
   });
   return post;
+}
+
+function urlEncode(str){
+    str=escape(str);
+    str=str.replace(new RegExp('\\+','g'),'%2B');
+    return str.replace(new RegExp('%20','g'),'+');
 }
