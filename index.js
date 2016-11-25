@@ -3,13 +3,16 @@ const querystring = require('querystring');
 const fs = require('fs');
 const cheerio = require('cheerio');
 
-module.exports = {curl, array_clean, str_clean, save_log, append, serialize_post};
+module.exports = {curl, array_clean, str_clean, save_log, append, serialize_post, jquery};
 
 function curl(link, options) {
   if(!options) options = {};
+
+  if(typeof options.redirect == 'undefined') options.redirect = true;
+  else options.redirect = options.redirect;
+  
   if(typeof link == 'string') options.url = link;
   else options = link;
-  if(!options.redirect) options.redirect = true;
   let url = options.url;
   let referer = (options.referer) ? `-e '${options.referer};auto' ` : `-e ';auto' `;
   let useragent = (options.useragent) ? `-A '${options.useragent}' ` : `-A 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 Safari/537.36' `;
@@ -108,7 +111,13 @@ function headers_to_object(str) {
     let index = item.indexOf(': ');
     let key = item.substr(0,index);
     let value = item.substr(index+2);
-    output[key] = value;
+    if(typeof output[key] != 'undefined') {
+      if(key.toLowerCase() == 'set-cookie') {
+        output[key] = output[key] + '; ' + value ;
+      } else {
+        output[key] = output[key] + value ;
+      }
+    } else output[key] = value;
   })
   return output;
 }
@@ -165,4 +174,8 @@ function urlEncode(str){
     str=escape(str);
     str=str.replace(new RegExp('\\+','g'),'%2B');
     return str.replace(new RegExp('%20','g'),'+');
+}
+
+function jquery(str) {
+  return cheerio.load(str);
 }
