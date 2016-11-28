@@ -2,17 +2,18 @@ const exec = require('child_process').exec;
 const querystring = require('querystring');
 const fs = require('fs');
 const cheerio = require('cheerio');
+const url = require('url');
 
-module.exports = {curl, array_clean, str_clean, save_log, append, serialize_post, jquery};
+module.exports = {curl, array_clean, str_clean, save_log, append, serialize_post, jquery,base64_encode, base64_decode, strip_html, parse_url, list_file};
 
 function curl(link, options) {
   if(!options) options = {};
 
   if(typeof options.redirect == 'undefined') options.redirect = true;
   else options.redirect = options.redirect;
-  
+
   if(typeof link == 'string') options.url = link;
-  else options = link;
+  else options.url = link;
   let url = options.url;
   let referer = (options.referer) ? `-e '${options.referer};auto' ` : `-e ';auto' `;
   let useragent = (options.useragent) ? `-A '${options.useragent}' ` : `-A 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 Safari/537.36' `;
@@ -22,11 +23,16 @@ function curl(link, options) {
   let include = '-i '; // (options.include) ? '-i ' : '';
   let cookie = (options.cookie) ? `-H 'Cookie: ${options.cookie}' ` : '';
   let location = (options.redirect) ? '-L ' : '';
-  let command = `curl ${useragent+head_only+include+headers+cookie+location+post+referer}'${url}'`;
+  let command = `curl -g ${useragent+head_only+include+headers+cookie+location+post+referer}'${url}'`;
   return new Promise((resolve, reject) => {
     exec(command,{maxBuffer: 1024 * 5000}, (err, res) => {
       if(err) reject(err);
-      let output = parse_res(res, options.cookie, url);
+      let output = '';
+      try {
+        output = parse_res(res, options.cookie, url);
+      } catch (e) {
+        reject(res);
+      }
       resolve(output);
     })
   });
@@ -178,4 +184,24 @@ function urlEncode(str){
 
 function jquery(str) {
   return cheerio.load(str);
+}
+
+function base64_encode(str) {
+  return new Buffer(str).toString('base64')
+}
+
+function base64_decode(str) {
+  return new Buffer(str, 'base64').toString('ascii')
+}
+
+function strip_html(str) {
+  return str.replace(/<(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/g, "");
+}
+
+function parse_url(link) {
+  return url.parse(link);
+}
+
+function list_file(dir) {
+  return  fs.readdirSync(dir);
 }
