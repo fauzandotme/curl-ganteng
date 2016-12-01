@@ -1,6 +1,6 @@
 {
   "name": "curl-ganteng",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Curl module for node js. Using curl command.",
   "main": "index.js",
   "scripts": {
