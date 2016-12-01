@@ -58,6 +58,7 @@ function parse_res(res, cookie_obj, req_url) {
 }
 
 function obj_to_post(post) {
+  if(typeof post == 'string') return post;
   let output = '';
   for (var key in post) {
     if (post.hasOwnProperty(key)) {
