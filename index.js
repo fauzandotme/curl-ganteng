@@ -27,7 +27,7 @@ function curl(link, options) {
   let command = `curl -g ${useragent+head_only+include+headers+cookie+location+post+referer+method}'${url}'`;
   return new Promise((resolve, reject) => {
     exec(command,{maxBuffer: 1024 * 5000}, (err, res) => {
-      if(err) reject(err);
+      if(err) reject(parseErr(err));
       let output = '';
       try {
         output = parse_res(res, options.cookie, url);
@@ -37,6 +37,22 @@ function curl(link, options) {
       resolve(output);
     })
   });
+}
+
+function parseErr(err) {
+  let out = err.message.match(/curl:+.+/g);
+  if(out) {
+    try {
+      let code = out[0].match(/curl:+\s\(\d+\)/g);
+      code = code[0].match(/\d+/g);
+      code = code[0];
+      let message = out[0].replace(/curl:+\s\(\d+\)/g, '');
+      return {error: code, message: message};
+    } catch (e) {
+      return {error: 1, message: out[0]};
+    }
+  }
+  return err;
 }
 
 function parse_res(res, cookie_obj, req_url) {
