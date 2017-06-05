@@ -25,9 +25,13 @@ function curl(link, options) {
   let location = (options.redirect) ? '-L ' : '';
   let method = (options.method) ? `-X ${options.method} ` : '';
   let command = `curl -g ${useragent+head_only+include+headers+cookie+location+post+referer+method}'${url}'`;
+  if(options.debug) console.log(command);
   return new Promise((resolve, reject) => {
     exec(command,{maxBuffer: 1024 * 5000}, (err, res) => {
-      if(err) reject(parseErr(err));
+      if(err) {
+        err = parseErr(err);
+        if(err.error != 56) reject(err)
+      }
       let output = '';
       try {
         output = parse_res(res, options.cookie, url);
@@ -169,7 +173,7 @@ function append(obj, new_obj) {
 
 function save_log(data, file_name) {
   if(typeof data === 'object') data = JSON.stringify(data);
-  fs.writeFileSync(`./${file_name}`, data);
+  fs.writeFileSync(`${file_name}`, data);
 }
 
 function array_clean(arr) {
