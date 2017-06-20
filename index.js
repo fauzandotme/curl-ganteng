@@ -24,7 +24,8 @@ function curl(link, options) {
   let cookie = (options.cookie) ? `-H 'Cookie: ${options.cookie}' ` : '';
   let location = (options.redirect) ? '-L ' : '';
   let method = (options.method) ? `-X ${options.method} ` : '';
-  let command = `curl -g ${useragent+head_only+include+headers+cookie+location+post+referer+method}'${url}'`;
+  let ipv6 = (option.ipv6) ? `-6 ` : '';
+  let command = `curl -g ${ipv6+useragent+head_only+include+headers+cookie+location+post+referer+method}'${url}'`;
   if(options.debug) console.log(command);
   return new Promise((resolve, reject) => {
     exec(command,{maxBuffer: 1024 * 5000}, (err, res) => {
